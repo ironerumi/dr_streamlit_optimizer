@@ -116,9 +116,11 @@ def get_prediction(df, deployment_id, url):
         return json_normalize(predictions_response.json()["data"]).prediction.values
 
 
+if "is_expanded" not in st.session_state:
+    st.session_state["is_expanded"] = True
 st.header("多目的(2)最適化")
 if api_key and datarobot_key and deployment_id1 and deployment_id2 and file_upload:
-    with st.expander("設定", expanded=True):
+    with st.expander("設定", expanded=st.session_state["is_expanded"]):
         dr.Client(token=api_key, endpoint="https://app.datarobot.com/api/v2")
         st.text(f"dr client version: {dr.__version__}")
 
@@ -177,10 +179,9 @@ if api_key and datarobot_key and deployment_id1 and deployment_id2 and file_uplo
     button_optimize = placeholder.button("最適化実行", disabled=True, key="btn_1")
     if len(list_flex) > 0:
         button_optimize = placeholder.button("最適化実行", key="btn_2")
-    sampler = optuna.samplers.NSGAIISampler()
-    study = optuna.create_study(directions=["maximize", "maximize"], sampler=sampler)
 
     if button_optimize:
+        st.session_state["is_expanded"] = False
 
         def objective(trail):
             df_target = pd.DataFrame(index=[0], columns=df.columns)
@@ -195,6 +196,10 @@ if api_key and datarobot_key and deployment_id1 and deployment_id2 and file_uplo
             return pred_1, pred_2
 
         with st.spinner("最適中・・・"):
+            sampler = optuna.samplers.NSGAIISampler()
+            study = optuna.create_study(
+                directions=["maximize", "maximize"], sampler=sampler
+            )
             study.optimize(objective, n_trials=n_trials, gc_after_trial=True)
     with st.expander("最適結果", expanded=True):
         # gather data
