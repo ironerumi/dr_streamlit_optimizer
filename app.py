@@ -151,11 +151,13 @@ if api_key and datarobot_key and deployment_id1 and deployment_id2 and file_uplo
 
         with st.container():
             for i, col in enumerate(list_flex):
+                min = float(df[col].min())
+                max = float(df[col].max())
                 val_flex[i] = st.slider(
                     col,
-                    df[col].min(),
-                    df[col].max(),
-                    (df[col].min(), df[col].max()),
+                    min,
+                    max,
+                    (min, max),
                     key=f"{col}_{i}",
                 )
 
