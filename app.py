@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 from pandas import json_normalize
 from optuna.exceptions import ExperimentalWarning
 
+import japanize_matplotlib
+
 warnings.filterwarnings(
     "ignore", category=ExperimentalWarning, module="optuna.multi_objective"
 )
@@ -200,7 +202,7 @@ if api_key and datarobot_key and deployment_id1 and deployment_id2 and file_uplo
             study = optuna.create_study(
                 directions=["maximize", "maximize"], sampler=sampler
             )
-            study.optimize(objective, n_trials=n_trials, gc_after_trial=True)
+            study.optimize(objective, n_trials=n_trials, gc_after_trial=True, n_jobs=5)
     with st.expander("最適結果", expanded=True):
         # gather data
         trial_all = []
